@@ -8,4 +8,6 @@
     <string name="rationale_negative_button">Exit App</string>
     <string name="go_to_app_settings">Go To Settings</string>
     <string name="user_rejected_permissions_permanently_message">Location permissions are required for this app to function, please grant permissions in app settings.</string>
+    <string name="add_remove_locations">Add / Remove Locations</string>
+    <string name="temperature_template">%d°C</string>
 </resources>

@@ -28,7 +28,7 @@ class MainScreenViewModel(
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
                 _uiState.value = _uiState.value.copy(
                     details = listOf(currentLocationDetails) + weatherDetailsList,
-                    state = if (_uiState.value.currentLocationDetails.temperature == 0.0) MainScreenUIState.State.LOADING
+                    state = if (_uiState.value.currentLocationDetails.temperature == 0) MainScreenUIState.State.LOADING
                     else MainScreenUIState.State.SUCCESS
                 )
                 delay(1_000)

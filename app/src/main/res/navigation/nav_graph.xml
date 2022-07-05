@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/mainScreenFragment"
         android:name="com.giniapps.currentweather.screens.main.MainScreenFragment"
-        android:label="fragment_main_screen"
+        android:label="Current Weather"
         tools:layout="@layout/fragment_main_screen" >
         <action
             android:id="@+id/action_mainScreenFragment_to_mapFragment"
@@ -18,7 +18,7 @@
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.giniapps.currentweather.screens.map.MapFragment"
-        android:label="fragment_map"
+        android:label="Add / Remove Locations"
         tools:layout="@layout/fragment_map" />
 
 </navigation>

@@ -7,6 +7,91 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
 
+    <LinearLayout
+        android:id="@+id/current_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/divider_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/country_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            tools:text="Israel"/>
+
+        <ImageView
+            android:id="@+id/weather_icon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            tools:src="@drawable/ic_launcher_background"
+            android:scaleType="centerCrop"
+            android:layout_margin="12dp"/>
+
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            tools:text="30°C"
+            android:textSize="30sp"/>
+
+        <TextView
+            android:id="@+id/summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            tools:text="Mostly Cloudy"/>
+    </LinearLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/locations_list"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/locations_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="6dp"
+        app:layout_constraintBottom_toTopOf="@id/divider_bottom"/>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/edit_locations_button"/>
+
+    <Button
+        android:id="@+id/edit_locations_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/add_remove_locations"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="12dp"/>
+
+    <FrameLayout
+        android:id="@+id/progress_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/dim_color"
+        android:elevation="100dp">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

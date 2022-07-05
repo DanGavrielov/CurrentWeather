@@ -6,50 +6,26 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.giniapps.currentweather.R
-import kotlinx.coroutines.launch
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-open class LocationFragment : Fragment() {
+open class BaseFragment : Fragment() {
     private lateinit var launcher: ActivityResultLauncher<Array<String>>
 
-    fun initPermissionLauncher(
-        onGranted: () -> Unit,
-        onRejected: () -> Unit
-    ) {
-        launcher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            when {
-                permissions.getOrDefault(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    false
-                ) -> {
-                    onGranted()
-                }
-                permissions.getOrDefault(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    false
-                ) -> {
-                    onGranted()
-                }
-                else -> {
-                    onRejected()
-                }
-            }
-        }
+    private var useLocation: () -> Unit = {}
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initPermissionLauncher()
     }
 
     fun askLocationPermission(
         useLocation: () -> Unit
     ) {
+        this.useLocation = useLocation
         when {
-            permissionsGranted() -> useLocation()
+            permissionsGranted() -> this.useLocation()
 
             shouldShowRational() -> locationPermissionRationale()
 
@@ -62,6 +38,30 @@ open class LocationFragment : Fragment() {
         }
     }
 
+    private fun initPermissionLauncher() {
+        launcher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions.getOrDefault(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    false
+                ) -> {
+                    useLocation()
+                }
+                permissions.getOrDefault(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    false
+                ) -> {
+                    useLocation()
+                }
+                else -> {
+                    locationPermissionRationale()
+                }
+            }
+        }
+    }
+
     private fun shouldShowRational() =
         shouldShowRequestPermissionRationale(
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -69,7 +69,7 @@ open class LocationFragment : Fragment() {
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
 
-    fun locationPermissionRationale() {
+    private fun locationPermissionRationale() {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.rationale_title))
             .setMessage(getString(R.string.rationale_message))
@@ -87,7 +87,7 @@ open class LocationFragment : Fragment() {
         dialog.show()
     }
 
-    fun permissionsGranted() =
+    private fun permissionsGranted() =
         ContextCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.ACCESS_COARSE_LOCATION
