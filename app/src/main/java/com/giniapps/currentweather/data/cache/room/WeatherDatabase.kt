@@ -4,15 +4,24 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.giniapps.currentweather.data.cache.room.daos.CurrentLocationDao
 import com.giniapps.currentweather.data.cache.room.daos.LocationDao
 import com.giniapps.currentweather.data.cache.room.daos.WeatherDetailsDao
+import com.giniapps.currentweather.data.cache.room.entities.CurrentLocationEntity
 import com.giniapps.currentweather.data.cache.room.entities.LocationEntity
 import com.giniapps.currentweather.data.cache.room.entities.WeatherDetailsEntity
 
-@Database(entities = [WeatherDetailsEntity::class, LocationEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [
+        WeatherDetailsEntity::class,
+        LocationEntity::class,
+        CurrentLocationEntity::class
+    ], version = 1, exportSchema = false
+)
 abstract class WeatherDatabase: RoomDatabase() {
     abstract fun weatherDetailsDao(): WeatherDetailsDao
     abstract fun locationDao(): LocationDao
+    abstract fun currentLocationDao(): CurrentLocationDao
 
     companion object {
         @Volatile

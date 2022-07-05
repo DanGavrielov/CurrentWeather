@@ -28,7 +28,7 @@ class RemoteDataSource(
         var result: WeatherDetails? = null
         val job = scope.launch(Dispatchers.IO) {
             val response = client
-                .getWeatherFromLocation(location.latitude, location.longitude)
+                .getWeatherFromLocation(Headers, location.latitude, location.longitude)
                 .execute()
             response.body()?.let {
                 result = getWeatherDetailsFromApiResponse(it)
@@ -52,4 +52,13 @@ class RemoteDataSource(
 
     private fun getIconUrlFromIconName(icon: String) =
         "https://assetambee.s3-us-west-2.amazonaws.com/weatherIcons/PNG/$icon.png"
+
+    companion object {
+        private const val ApiKey = "3e2eb78ed4bd25f8be137d4b550989672c999e9b80c4f3fd1ef70858cd05ce6c"
+
+        private val Headers = mapOf(
+            "x-api-key" to ApiKey,
+            "Content-type" to "application/json"
+        )
+    }
 }

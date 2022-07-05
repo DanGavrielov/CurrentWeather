@@ -1,5 +1,6 @@
 package com.giniapps.currentweather.data.repository
 
+import android.util.Log
 import com.giniapps.currentweather.data.GeocoderUtil
 import com.giniapps.currentweather.data.cache.Cache
 import com.giniapps.currentweather.data.cache.room.entities.CurrentLocationEntity
@@ -36,6 +37,7 @@ class WeatherDataRepository(
 
     override suspend fun getAllDetailsFromCache(): List<WeatherDetailsModel> {
         val detailEntities = cache.getWeatherDetailsForAllLocations()
+//        Log.d(TAG, "detailEntities received ~> $detailEntities")
         return if (detailEntities.isEmpty())
             getAllDetailsFromRemoteAndSaveToCache()
         else
@@ -106,12 +108,19 @@ class WeatherDataRepository(
 
     override suspend fun getDetailsForCurrentLocationFromCache(): WeatherDetailsModel {
         val currentLocation = cache.getCurrentLocation()
+//        Log.d(TAG, "currentLocation received ~> ${currentLocation.latitude}, ${currentLocation.longitude}")
         val details = cache.getDetailsForCurrentLocation()
-        return WeatherDetailsModel.fromEntity(details, currentLocation)
+//        Log.d(TAG, "details received ~> $details")
+        return if (details != null)
+            WeatherDetailsModel.fromEntity(details, currentLocation)
+        else
+            WeatherDetailsModel.emptyObject()
+
     }
 
     override suspend fun getDetailsForCurrentLocationFromRemoteAndSaveToCache() {
         val currentLocation = cache.getCurrentLocation()
+//        Log.d(TAG, "currentLocation received ~> ${currentLocation.latitude}, ${currentLocation.longitude}")
         val detailsFromRemote = dataSource.getWeatherForLocation(
             location = Location(
                 currentLocation.latitude,
@@ -119,6 +128,7 @@ class WeatherDataRepository(
                 currentLocation.countryName
             )
         )
+//        Log.d(TAG, "detailsFromRemote received ~> $detailsFromRemote")
         detailsFromRemote?.let {
             val currentLocationDetailsEntity = WeatherDetailsEntity(
                 temperature = it.temperature,
@@ -153,5 +163,9 @@ class WeatherDataRepository(
             !detailsIdsToKeep.contains(it.detailsId)
         }
         detailsToDelete.forEach { cache.deleteDetails(it) }
+    }
+
+    companion object {
+        private const val TAG = "RepositoryDebug"
     }
 }

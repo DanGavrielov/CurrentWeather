@@ -11,6 +11,10 @@ data class WeatherDetailsModel(
     val summary: String,
     val iconUrl: String,
 ) {
+    override fun toString(): String {
+        return "WeatherDetailsModel(countryName='$countryName', location=$location, temperature=$temperature, summary='$summary', iconUrl='$iconUrl')"
+    }
+
     companion object {
         fun fromEntity(
             detailsEntity: WeatherDetailsEntity,
@@ -39,5 +43,14 @@ data class WeatherDetailsModel(
             summary = detailsEntity.summary,
             iconUrl = detailsEntity.iconUrl
         )
+
+        fun emptyObject() =
+            WeatherDetailsModel(
+                countryName = "",
+                location = LocationModel(0.0, 0.0),
+                temperature = 0.0,
+                summary = "",
+                iconUrl = ""
+            )
     }
 }

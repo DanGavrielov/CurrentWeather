@@ -22,6 +22,6 @@ interface Cache {
 
     suspend fun updateCurrentLocation(locationEntity: CurrentLocationEntity)
     suspend fun getCurrentLocation(): CurrentLocationEntity
-    suspend fun getDetailsForCurrentLocation(): WeatherDetailsEntity
+    suspend fun getDetailsForCurrentLocation(): WeatherDetailsEntity?
     suspend fun removeCurrentLocationDetailsFromCache()
 }

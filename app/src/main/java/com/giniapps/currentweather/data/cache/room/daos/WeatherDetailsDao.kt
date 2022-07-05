@@ -1,12 +1,10 @@
 package com.giniapps.currentweather.data.cache.room.daos
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.giniapps.currentweather.data.cache.room.entities.WeatherDetailsEntity
 import com.giniapps.currentweather.data.models.WeatherDetails
 
+@Dao
 interface WeatherDetailsDao {
     @Insert
     suspend fun insertDetails(weatherDetails: WeatherDetailsEntity)
