@@ -17,10 +17,10 @@ class MainScreenViewModel(
     private val repository: Repository,
     private val locationManager: LocationManager
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(UIState())
+    private val _uiState = MutableStateFlow(MainScreenUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    init {
+    fun initViewModel() {
         setupLocationListener()
         flow<List<WeatherDetailsModel>> {
             while (true) {
@@ -28,8 +28,8 @@ class MainScreenViewModel(
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
                 _uiState.value = _uiState.value.copy(
                     details = listOf(currentLocationDetails) + weatherDetailsList,
-                    state = if (_uiState.value.currentLocationDetails.temperature == 0.0) UIState.State.LOADING
-                    else UIState.State.SUCCESS
+                    state = if (_uiState.value.currentLocationDetails.temperature == 0.0) MainScreenUIState.State.LOADING
+                    else MainScreenUIState.State.SUCCESS
                 )
                 delay(1_000)
             }
@@ -41,8 +41,8 @@ class MainScreenViewModel(
                 Log.d(TAG, "currentLocationDetails received ~> $currentLocationDetails")
                 _uiState.value = _uiState.value.copy(
                     currentLocationDetails = currentLocationDetails,
-                    state = if (_uiState.value.details.isEmpty()) UIState.State.LOADING
-                    else UIState.State.SUCCESS
+                    state = if (_uiState.value.details.isEmpty()) MainScreenUIState.State.LOADING
+                    else MainScreenUIState.State.SUCCESS
                 )
                 delay(1_000)
             }
@@ -63,6 +63,7 @@ class MainScreenViewModel(
                 }
             }
         }
+        locationManager.requestLocationUpdates()
     }
 
     companion object {

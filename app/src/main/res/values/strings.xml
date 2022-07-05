@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Current Weather</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="rationale_title">Location Permission Required</string>
+    <string name="rationale_message">In order to use this app, location updates are required</string>
+    <string name="rationale_positive_button">Grant Permissions</string>
+    <string name="rationale_negative_button">Exit App</string>
+    <string name="go_to_app_settings">Go To Settings</string>
+    <string name="user_rejected_permissions_permanently_message">Location permissions are required for this app to function, please grant permissions in app settings.</string>
 </resources>
