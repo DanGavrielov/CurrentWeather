@@ -78,6 +78,7 @@ class WeatherDataRepository(
     }
 
     override suspend fun removeLocation(location: LocationModel) {
+        cache.removeDetailsForLocation(location.latitude, location.longitude)
         cache.removeLocationAt(location.latitude, location.longitude)
         updateCachedData()
     }
@@ -108,9 +109,7 @@ class WeatherDataRepository(
 
     override suspend fun getDetailsForCurrentLocationFromCache(): WeatherDetailsModel {
         val currentLocation = cache.getCurrentLocation()
-//        Log.d(TAG, "currentLocation received ~> ${currentLocation.latitude}, ${currentLocation.longitude}")
         val details = cache.getDetailsForCurrentLocation()
-//        Log.d(TAG, "details received ~> $details")
         return if (details != null)
             WeatherDetailsModel.fromEntity(details, currentLocation)
         else
@@ -178,7 +177,7 @@ class WeatherDataRepository(
     }
 
     private fun CurrentLocationEntity.asLocationModel() =
-        LocationModel(countryName, latitude, longitude)
+        LocationModel(countryName, latitude, longitude, true)
 
     companion object {
         private const val TAG = "RepositoryDebug"

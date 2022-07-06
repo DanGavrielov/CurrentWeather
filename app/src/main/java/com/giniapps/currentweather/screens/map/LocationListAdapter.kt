@@ -2,6 +2,7 @@ package com.giniapps.currentweather.screens.map
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.giniapps.currentweather.data.repository.models.LocationModel
 import com.giniapps.currentweather.databinding.LocationItemBinding
@@ -31,13 +32,14 @@ class LocationListAdapter(
         private val onDeleteButtonClicked: (LocationModel) -> Unit
     ): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LocationModel) {
-
             with(binding) {
                 root.layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-                countryName.text = item.countryName
+                countryName.text = if (item.currentPlace) "${item.countryName} (current location)"
+                else item.countryName
+                removeButton.isVisible = !item.currentPlace
                 removeButton.setOnClickListener {
                     onDeleteButtonClicked(item)
                 }

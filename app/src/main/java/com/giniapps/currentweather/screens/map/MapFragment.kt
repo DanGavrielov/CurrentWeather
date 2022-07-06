@@ -12,12 +12,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.giniapps.currentweather.R
+import com.giniapps.currentweather.data.repository.models.WeatherDetailsModel
 import com.giniapps.currentweather.databinding.FragmentMapBinding
 import com.giniapps.currentweather.screens.BaseFragment
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.flow.collectLatest
@@ -27,7 +29,11 @@ import org.koin.android.ext.android.inject
 class MapFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentMapBinding
     private val viewModel: MapScreenViewModel by inject()
+    private val mapMarkers = mutableListOf<Marker>()
     private val adapter = LocationListAdapter {
+        val marker = mapMarkers.first { marker -> marker.title == it.countryName }
+        marker.remove()
+
         viewModel.removeLocation(it)
     }
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
@@ -90,14 +96,19 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
                 launch {
                     viewModel.uiState.collectLatest {
                         it.details.forEach { det ->
-                            map.addMarker(
-                                MarkerOptions().position(
-                                    LatLng(
-                                        det.location.latitude,
-                                        det.location.longitude
-                                    )
-                                ).title(det.countryName)
-                            )
+                            if (det != WeatherDetailsModel.emptyObject()) {
+                                map.addMarker(
+                                    MarkerOptions().position(
+                                        LatLng(
+                                            det.location.latitude,
+                                            det.location.longitude
+                                        )
+                                    ).title(det.countryName)
+                                ).also { marker ->
+                                    if (marker != null)
+                                        mapMarkers.add(marker)
+                                }
+                            }
                         }
                         with(binding) {
                             progressContainer.isVisible =

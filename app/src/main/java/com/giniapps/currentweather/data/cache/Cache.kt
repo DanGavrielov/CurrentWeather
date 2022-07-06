@@ -11,6 +11,7 @@ interface Cache {
     suspend fun doesWeatherDetailsExistsForLocation(locationId: Long): Boolean
     suspend fun getDetailsForLocation(locationId: Long): WeatherDetailsEntity
     suspend fun removeDetailsForLocation(locationId: Long)
+    suspend fun removeDetailsForLocation(lat: Double, lng: Double)
     suspend fun getAllWeatherDetails(): List<WeatherDetailsEntity>
     suspend fun deleteDetails(weatherDetailsEntity: WeatherDetailsEntity)
 

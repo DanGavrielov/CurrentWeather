@@ -25,4 +25,7 @@ interface LocationDao {
 
     @Query("DELETE FROM locations WHERE latitude = :lat AND longitude = :lng")
     suspend fun removeLocationAt(lat: Double, lng: Double)
+
+    @Query("SELECT * FROM locations WHERE latitude = :lat AND longitude = :lng")
+    suspend fun getLocationAt(lat: Double, lng: Double): LocationEntity
 }

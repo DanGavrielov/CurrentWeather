@@ -49,6 +49,11 @@ class WeatherCache(
     override suspend fun removeDetailsForLocation(locationId: Long) =
         detailsDao.deleteDetailsForLocation(locationId)
 
+    override suspend fun removeDetailsForLocation(lat: Double, lng: Double) {
+        val locationEntity = locationDao.getLocationAt(lat, lng)
+        detailsDao.deleteDetailsForLocation(locationEntity.locationId)
+    }
+
     override suspend fun getAllWeatherDetails() =
         detailsDao.getAllWeatherDetails()
 
