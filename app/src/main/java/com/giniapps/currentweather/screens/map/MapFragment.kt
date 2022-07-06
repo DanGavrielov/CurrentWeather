@@ -11,13 +11,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.giniapps.currentweather.R
 import com.giniapps.currentweather.databinding.FragmentMapBinding
 import com.giniapps.currentweather.screens.BaseFragment
-import com.giniapps.currentweather.screens.main.MainScreenViewModel
-import com.giniapps.currentweather.screens.main.MainScreenUIState
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -37,13 +36,14 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.locationsList.adapter = adapter
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+        bottomSheetBehavior.peekHeight = 60.toPx()
         askLocationPermission(::locationPermissionsGranted)
     }
 
     private fun locationPermissionsGranted() {
         viewModel.initViewModel()
-        binding.locationsList.adapter = adapter
         setupMap()
     }
 
@@ -79,4 +79,7 @@ class MapFragment : BaseFragment(), OnMapReadyCallback {
             }
         }
     }
+
+    private fun Int.toPx() =
+        this * requireContext().resources.displayMetrics.density.toInt()
 }

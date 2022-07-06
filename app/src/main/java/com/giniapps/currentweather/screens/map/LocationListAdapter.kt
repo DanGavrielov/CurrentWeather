@@ -31,7 +31,12 @@ class LocationListAdapter(
         private val onDeleteButtonClicked: (LocationModel) -> Unit
     ): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: LocationModel) {
+
             with(binding) {
+                root.layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
                 countryName.text = item.countryName
                 removeButton.setOnClickListener {
                     onDeleteButtonClicked(item)

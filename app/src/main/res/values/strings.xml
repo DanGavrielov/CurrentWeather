@@ -9,4 +9,5 @@
     <string name="add_remove_locations">Add / Remove Locations</string>
     <string name="temperature_template">%d°C</string>
     <string name="bottom_sheet_title">%d Locations Tracked</string>
+    <string name="refresh_data">Refresh Data</string>
 </resources>

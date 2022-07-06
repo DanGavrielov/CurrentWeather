@@ -26,13 +26,21 @@ class MapScreenViewModel(
 
     fun initViewModel() {
         setupLocationListener()
+        refreshData()
+    }
+
+    fun refreshData() {
         flow<List<WeatherDetailsModel>> {
             while (true) {
                 val weatherDetailsList = repository.getAllDetailsFromCache()
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
-                _uiState.value = _uiState.value.copy(
-                    details = listOf(currentLocationDetails) + weatherDetailsList
-                )
+                val finalList = listOf(currentLocationDetails) + weatherDetailsList
+                if (finalList.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        details = finalList
+                    )
+                    break
+                }
                 delay(1_000)
             }
         }.launchIn(viewModelScope)
@@ -40,9 +48,12 @@ class MapScreenViewModel(
         flow<WeatherDetailsModel> {
             while (true) {
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
-                _uiState.value = _uiState.value.copy(
-                    currentLocationDetails = currentLocationDetails
-                )
+                if (currentLocationDetails != WeatherDetailsModel.emptyObject()) {
+                    _uiState.value = _uiState.value.copy(
+                        currentLocationDetails = currentLocationDetails
+                    )
+                    break
+                }
                 delay(1_000)
             }
         }.launchIn(viewModelScope)
@@ -51,9 +62,13 @@ class MapScreenViewModel(
             while (true) {
                 val locations = repository.getAllLocations()
                 val currentLocation = repository.getCurrentLocation()
-                _uiState.value = _uiState.value.copy(
-                    locations = listOf(currentLocation) + locations
-                )
+                val finalList = listOf(currentLocation) + locations
+                if (finalList.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        locations = finalList
+                    )
+                    break
+                }
                 delay(1_000)
             }
         }.launchIn(viewModelScope)
@@ -61,9 +76,12 @@ class MapScreenViewModel(
         flow<LocationModel> {
             while (true) {
                 val currentLocation = repository.getCurrentLocation()
-                _uiState.value = _uiState.value.copy(
-                    currentLocation = currentLocation
-                )
+                if (currentLocation != LocationModel.emptyObject()) {
+                    _uiState.value = _uiState.value.copy(
+                        currentLocation = currentLocation
+                    )
+                    break
+                }
                 delay(1_000)
             }
         }.launchIn(viewModelScope)

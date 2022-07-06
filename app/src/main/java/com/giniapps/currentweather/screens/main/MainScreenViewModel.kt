@@ -1,6 +1,7 @@
 package com.giniapps.currentweather.screens.main
 
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giniapps.currentweather.data.GeocoderUtil
@@ -23,15 +24,25 @@ class MainScreenViewModel(
 
     fun initViewModel() {
         setupLocationListener()
+        refreshData()
+    }
+
+    fun refreshData() {
+        Log.d(TAG, "refreshData() called")
         flow<List<WeatherDetailsModel>> {
             while (true) {
                 val weatherDetailsList = repository.getAllDetailsFromCache()
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
-                _uiState.value = _uiState.value.copy(
-                    details = listOf(currentLocationDetails) + weatherDetailsList,
-                    state = if (_uiState.value.currentLocationDetails.temperature == 0) MainScreenUIState.State.LOADING
-                    else MainScreenUIState.State.SUCCESS
-                )
+                val finalList = listOf(currentLocationDetails) + weatherDetailsList
+                if (finalList.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        details = finalList,
+                        state = if (_uiState.value.currentLocationDetails.temperature == 0) MainScreenUIState.State.LOADING
+                        else MainScreenUIState.State.SUCCESS
+                    )
+                    Log.d(TAG, "done collecting weather details")
+                    break
+                }
                 delay(1_000)
             }
         }.launchIn(viewModelScope)
@@ -39,11 +50,15 @@ class MainScreenViewModel(
         flow<WeatherDetailsModel> {
             while (true) {
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
-                _uiState.value = _uiState.value.copy(
-                    currentLocationDetails = currentLocationDetails,
-                    state = if (_uiState.value.details.isEmpty()) MainScreenUIState.State.LOADING
-                    else MainScreenUIState.State.SUCCESS
-                )
+                if (currentLocationDetails != WeatherDetailsModel.emptyObject()) {
+                    _uiState.value = _uiState.value.copy(
+                        currentLocationDetails = currentLocationDetails,
+                        state = if (_uiState.value.details.isEmpty()) MainScreenUIState.State.LOADING
+                        else MainScreenUIState.State.SUCCESS
+                    )
+                    Log.d(TAG, "done collecting current weather details")
+                    break
+                }
                 delay(1_000)
             }
         }.launchIn(viewModelScope)
