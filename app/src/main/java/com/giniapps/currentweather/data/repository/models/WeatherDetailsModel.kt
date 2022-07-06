@@ -23,6 +23,7 @@ data class WeatherDetailsModel(
         ) = WeatherDetailsModel(
             countryName = locationEntity.countryName,
             location = LocationModel(
+                countryName = locationEntity.countryName,
                 latitude = locationEntity.latitude,
                 longitude = locationEntity.longitude
             ),
@@ -37,6 +38,7 @@ data class WeatherDetailsModel(
         ) = WeatherDetailsModel(
             countryName = locationEntity.countryName,
             location = LocationModel(
+                countryName = locationEntity.countryName,
                 latitude = locationEntity.latitude,
                 longitude = locationEntity.longitude
             ),
@@ -48,7 +50,7 @@ data class WeatherDetailsModel(
         fun emptyObject() =
             WeatherDetailsModel(
                 countryName = "",
-                location = LocationModel(0.0, 0.0),
+                location = LocationModel.emptyObject(),
                 temperature = 0,
                 summary = "",
                 iconUrl = ""

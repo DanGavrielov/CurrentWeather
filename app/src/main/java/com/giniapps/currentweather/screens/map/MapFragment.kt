@@ -1,60 +1,82 @@
 package com.giniapps.currentweather.screens.map
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.giniapps.currentweather.R
+import com.giniapps.currentweather.databinding.FragmentMapBinding
+import com.giniapps.currentweather.screens.BaseFragment
+import com.giniapps.currentweather.screens.main.MainScreenViewModel
+import com.giniapps.currentweather.screens.main.MainScreenUIState
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MapFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class MapFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+class MapFragment : BaseFragment(), OnMapReadyCallback {
+    private lateinit var binding: FragmentMapBinding
+    private val viewModel: MapScreenViewModel by inject()
+    private val adapter = LocationListAdapter { }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false)
+    ): View {
+        binding = FragmentMapBinding.inflate(inflater)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MapFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MapFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        askLocationPermission(::locationPermissionsGranted)
+    }
+
+    private fun locationPermissionsGranted() {
+        viewModel.initViewModel()
+        binding.locationsList.adapter = adapter
+        setupMap()
+    }
+
+    private fun setupMap() {
+        val mapFragment = childFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment!!.getMapAsync(this)
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.uiState.collectLatest {
+                        it.details.forEach { det ->
+                            map.addMarker(
+                                MarkerOptions().position(
+                                    LatLng(
+                                        det.location.latitude,
+                                        det.location.longitude
+                                    )
+                                ).title(det.countryName)
+                            )
+                        }
+                        with(binding) {
+                            progressContainer.isVisible =
+                                it.state == MapScreenUIState.State.LOADING
+                            title.text = getString(R.string.bottom_sheet_title, it.locations.size)
+                            adapter.items = it.locations
+                        }
+                    }
                 }
             }
+        }
     }
 }

@@ -17,4 +17,6 @@ interface Repository {
     suspend fun updateCurrentLocation(location: LocationModel)
     suspend fun getDetailsForCurrentLocationFromCache(): WeatherDetailsModel
     suspend fun getDetailsForCurrentLocationFromRemoteAndSaveToCache()
+    suspend fun getAllLocations(): List<LocationModel>
+    suspend fun getCurrentLocation(): LocationModel
 }

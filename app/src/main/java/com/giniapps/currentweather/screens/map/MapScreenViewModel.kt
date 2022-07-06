@@ -1,4 +1,4 @@
-package com.giniapps.currentweather.screens.main
+package com.giniapps.currentweather.screens.map
 
 import android.location.Location
 import androidx.lifecycle.ViewModel
@@ -10,15 +10,18 @@ import com.giniapps.currentweather.data.repository.models.WeatherDetailsModel
 import com.giniapps.currentweather.location.LocationListener
 import com.giniapps.currentweather.location.LocationManager
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 
-class MainScreenViewModel(
+class MapScreenViewModel(
     private val repository: Repository,
     private val locationManager: LocationManager,
     private val geocoderUtil: GeocoderUtil
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(MainScreenUIState())
+): ViewModel() {
+    private val _uiState = MutableStateFlow(MapScreenUIState())
     val uiState get() = _uiState.asStateFlow()
 
     fun initViewModel() {
@@ -28,9 +31,7 @@ class MainScreenViewModel(
                 val weatherDetailsList = repository.getAllDetailsFromCache()
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
                 _uiState.value = _uiState.value.copy(
-                    details = listOf(currentLocationDetails) + weatherDetailsList,
-                    state = if (_uiState.value.currentLocationDetails.temperature == 0) MainScreenUIState.State.LOADING
-                    else MainScreenUIState.State.SUCCESS
+                    details = listOf(currentLocationDetails) + weatherDetailsList
                 )
                 delay(1_000)
             }
@@ -40,9 +41,28 @@ class MainScreenViewModel(
             while (true) {
                 val currentLocationDetails = repository.getDetailsForCurrentLocationFromCache()
                 _uiState.value = _uiState.value.copy(
-                    currentLocationDetails = currentLocationDetails,
-                    state = if (_uiState.value.details.isEmpty()) MainScreenUIState.State.LOADING
-                    else MainScreenUIState.State.SUCCESS
+                    currentLocationDetails = currentLocationDetails
+                )
+                delay(1_000)
+            }
+        }.launchIn(viewModelScope)
+
+        flow<List<LocationModel>> {
+            while (true) {
+                val locations = repository.getAllLocations()
+                val currentLocation = repository.getCurrentLocation()
+                _uiState.value = _uiState.value.copy(
+                    locations = listOf(currentLocation) + locations
+                )
+                delay(1_000)
+            }
+        }.launchIn(viewModelScope)
+
+        flow<LocationModel> {
+            while (true) {
+                val currentLocation = repository.getCurrentLocation()
+                _uiState.value = _uiState.value.copy(
+                    currentLocation = currentLocation
                 )
                 delay(1_000)
             }
@@ -67,9 +87,5 @@ class MainScreenViewModel(
             }
         }
         locationManager.requestLocationUpdates()
-    }
-
-    companion object {
-        private const val TAG = "MainViewModelDebug"
     }
 }

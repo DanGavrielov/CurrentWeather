@@ -142,6 +142,18 @@ class WeatherDataRepository(
         }
     }
 
+    override suspend fun getAllLocations() =
+        cache.getAllLocations().map {
+            LocationModel(
+                countryName = it.countryName,
+                latitude = it.latitude,
+                longitude = it.longitude
+            )
+        }
+
+    override suspend fun getCurrentLocation() =
+        cache.getCurrentLocation().asLocationModel()
+
     private suspend fun createDetailsEntityFromRemoteModelAndSaveToCache(
         details: WeatherDetails,
         locationId: Long
@@ -164,6 +176,9 @@ class WeatherDataRepository(
         }
         detailsToDelete.forEach { cache.deleteDetails(it) }
     }
+
+    private fun CurrentLocationEntity.asLocationModel() =
+        LocationModel(countryName, latitude, longitude)
 
     companion object {
         private const val TAG = "RepositoryDebug"

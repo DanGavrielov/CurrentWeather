@@ -10,11 +10,11 @@ import com.giniapps.currentweather.data.repository.Repository
 import com.giniapps.currentweather.data.repository.WeatherDataRepository
 import com.giniapps.currentweather.location.LocationManager
 import com.giniapps.currentweather.screens.main.MainScreenViewModel
+import com.giniapps.currentweather.screens.map.MapScreenViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val remoteDataModule = module {
@@ -73,10 +73,20 @@ val viewModelModule = module {
     factory {
         LocationManager(androidContext())
     }
-    viewModel {
+
+    factory {
         MainScreenViewModel(
             repository = get(),
-            locationManager = get()
+            locationManager = get(),
+            geocoderUtil = get()
+        )
+    }
+
+    factory {
+        MapScreenViewModel(
+            repository = get(),
+            locationManager = get(),
+            geocoderUtil = get()
         )
     }
 }
