@@ -53,6 +53,7 @@ class MainScreenViewModel(
                 if (currentLocationDetails != WeatherDetailsModel.emptyObject()) {
                     _uiState.value = _uiState.value.copy(
                         currentLocationDetails = currentLocationDetails,
+                        locationToPresentInTheMiddle = currentLocationDetails,
                         state = if (_uiState.value.details.isEmpty()) MainScreenUIState.State.LOADING
                         else MainScreenUIState.State.SUCCESS
                     )
@@ -62,6 +63,12 @@ class MainScreenViewModel(
                 delay(1_000)
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun presentDetails(details: WeatherDetailsModel) {
+        _uiState.value = _uiState.value.copy(
+            locationToPresentInTheMiddle = details
+        )
     }
 
     private fun setupLocationListener() {

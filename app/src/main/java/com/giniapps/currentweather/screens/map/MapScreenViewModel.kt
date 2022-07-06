@@ -1,6 +1,7 @@
 package com.giniapps.currentweather.screens.map
 
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.giniapps.currentweather.data.GeocoderUtil
@@ -9,6 +10,7 @@ import com.giniapps.currentweather.data.repository.models.LocationModel
 import com.giniapps.currentweather.data.repository.models.WeatherDetailsModel
 import com.giniapps.currentweather.location.LocationListener
 import com.giniapps.currentweather.location.LocationManager
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +31,7 @@ class MapScreenViewModel(
         refreshData()
     }
 
-    fun refreshData() {
+    private fun refreshData() {
         flow<List<WeatherDetailsModel>> {
             while (true) {
                 val weatherDetailsList = repository.getAllDetailsFromCache()
@@ -87,6 +89,20 @@ class MapScreenViewModel(
         }.launchIn(viewModelScope)
     }
 
+    fun addLocation(location: LatLng) {
+        viewModelScope.launch {
+            repository.addLocation(location.asLocationModel())
+            refreshData()
+        }
+    }
+
+    fun removeLocation(location: LocationModel) {
+        viewModelScope.launch {
+            repository.removeLocation(location)
+            refreshData()
+        }
+    }
+
     private fun setupLocationListener() {
         locationManager.listener = object : LocationListener {
             override fun handleLocationUpdate(location: Location) {
@@ -105,5 +121,18 @@ class MapScreenViewModel(
             }
         }
         locationManager.requestLocationUpdates()
+    }
+
+    private fun LatLng.asLocationModel() =
+        LocationModel(
+            countryName = geocoderUtil.getCountryNameFromLocation(
+                latitude, longitude
+            )?: "N/A",
+            latitude = latitude,
+            longitude = longitude
+        )
+
+    companion object {
+        private const val TAG = "MapViewModelDebug"
     }
 }

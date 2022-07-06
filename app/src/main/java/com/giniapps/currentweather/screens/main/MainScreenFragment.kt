@@ -20,7 +20,9 @@ import org.koin.android.ext.android.inject
 class MainScreenFragment : BaseFragment() {
     private val viewModel: MainScreenViewModel by inject()
     private lateinit var binding: FragmentMainScreenBinding
-    private val adapter = TrackedLocationsAdapter { }
+    private val adapter = TrackedLocationsAdapter {
+        viewModel.presentDetails(it)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,15 +64,15 @@ class MainScreenFragment : BaseFragment() {
                         with(binding) {
                             progressContainer.isVisible =
                                 it.state == MainScreenUIState.State.LOADING
-                            countryName.text = it.currentLocationDetails.countryName
+                            countryName.text = it.locationToPresentInTheMiddle.countryName
                             temp.text = getString(
                                 R.string.temperature_template,
-                                it.currentLocationDetails.temperature
+                                it.locationToPresentInTheMiddle.temperature
                             )
-                            summary.text = it.currentLocationDetails.summary
-                            if (it.currentLocationDetails.iconUrl.isNotEmpty()) {
+                            summary.text = it.locationToPresentInTheMiddle.summary
+                            if (it.locationToPresentInTheMiddle.iconUrl.isNotEmpty()) {
                                 Picasso.get()
-                                    .load(it.currentLocationDetails.iconUrl)
+                                    .load(it.locationToPresentInTheMiddle.iconUrl)
                                     .into(weatherIcon)
                             }
                             adapter.items = it.details
